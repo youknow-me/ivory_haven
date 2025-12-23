@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ivory Haven | <%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Your Sanctuary of Peace and Luxury</h1>
+                <p>Discover a place where comfort meets elegance. Your unforgettable stay awaits.</p>
+                <a href="/bookings" class="cta-button">Book Your Stay</a>
+            </div>
+        </section>
+
+        <section class="container features">
+            <div class="feature-item">
+                <h3>Luxury Rooms</h3>
+                <p>Spacious and elegantly designed rooms with premium amenities.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Gourmet Dining</h3>
+                <p>Experience exquisite flavors at our in-house restaurant.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Relaxing Spa</h3>
+                <p>Rejuvenate your body and mind at our world-class spa.</p>
+            </div>
+        </section>
+
+        <section class="gallery">
+            <h2>Explore Our Haven</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                                        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070" alt="Luxury hotel room">
+                </div>
+                <div class="gallery-item">
+                                        <img src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1949" alt="Hotel swimming pool">
+                </div>
+                <div class="gallery-item">
+                                        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2070" alt="Fine dining restaurant">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

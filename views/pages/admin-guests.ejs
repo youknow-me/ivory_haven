@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guests</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    .guests-container {
+      max-width: 800px;
+      margin: 70px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .guests-container h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .guest-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .guest-item {
+      padding: 14px 18px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .guest-item:last-child {
+      border-bottom: none;
+    }
+
+    .guest-name {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .guest-email {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #4a90e2;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #777;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<%- include('../partials/header') %>
+
+<div class="guests-container">
+  <h1>All Guests</h1>
+
+  <% if (guests.length === 0) { %>
+    <div class="empty-state">No guests found.</div>
+  <% } else { %>
+    <ul class="guest-list">
+      <% guests.forEach(g => { %>
+        <li class="guest-item">
+          <div>
+            <div class="guest-name"><%= g.name %></div>
+            <div class="guest-email"><%= g.email %></div>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <a href="/admin/dashboard" class="back-link">⬅ Back to Dashboard</a>
+</div>
+
+<%- include('../partials/footer') %>
+
+</body>
+</html>

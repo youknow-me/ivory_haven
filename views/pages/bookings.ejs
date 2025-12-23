@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ivory Haven | <%= title %></title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <%- include('../partials/header') %>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <h1>Book Your Stay</h1>
+        <p class="subtitle">
+          Experience luxury and comfort. Fill out the form below to reserve your room.
+        </p>
+      </div>
+    </div>
+
+    <div class="container">
+      <form id="booking-form" class="booking-form">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="guest_name">Full Name</label>
+            <input type="text" id="guest_name" name="guest_name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="guest_email">Email Address</label>
+            <input type="email" id="guest_email" name="guest_email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="check_in_date">Check-in Date</label>
+            <input type="text" id="check_in_date" name="check_in_date" required>
+          </div>
+
+          <div class="form-group">
+            <label for="check_out_date">Check-out Date</label>
+            <input type="text" id="check_out_date" name="check_out_date" required>
+          </div>
+
+          <div class="form-group form-span-2">
+            <label for="room_id">Choose Your Room</label>
+            <select id="room_id" name="room_id" required>
+              <option value="" disabled selected>Select a room</option>
+              <% rooms.forEach(room => { %>
+                <option value="<%= room.id %>" data-price="<%= room.price_per_night %>">
+                  <%= room.room_type %> Room (#<%= room.room_number %>) -
+                  $<%= room.price_per_night %>/night
+                </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="promo_code">Promo Code (optional)</label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="promo_code" name="promo_code" placeholder="SAVE10">
+              <button type="button"
+                      class="submit-btn"
+                      style="width:auto"
+                      onclick="applyCoupon()">
+                Apply
+              </button>
+            </div>
+            <small id="coupon-message" style="display:block;margin-top:6px;"></small>
+          </div>
+
+          <div class="form-group price-display">
+            <label>Estimated Total</label>
+            <div id="price-estimate">
+              <span id="price-original"
+                    style="text-decoration:line-through; display:none;"></span>
+              <span id="price-final">$0.00</span>
+            </div>
+          </div>
+
+        </div>
+
+        <button type="submit" class="submit-btn">Book Now</button>
+      </form>
+
+      <div id="booking-response" class="response-message"></div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="/js/main.js"></script>
+
+  <!-- =========================
+       LOCALSTORAGE BROWSER CACHE
+       ========================= -->
+ <script>
+  function getSelectedRoomPrice() {
+    const roomSelect = document.getElementById("room_id");
+    const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+    return selectedOption ? parseFloat(selectedOption.dataset.price) : 0;
+  }
+
+  function getNights() {
+    const inDate = new Date(document.getElementById("check_in_date").value);
+    const outDate = new Date(document.getElementById("check_out_date").value);
+    const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
+    return diff > 0 ? diff : 0;
+  }
+
+  function updatePrice(original, final) {
+    const origEl = document.getElementById("price-original");
+    const finalEl = document.getElementById("price-final");
+
+    if (original !== final) {
+      origEl.style.display = "inline";
+      origEl.innerText = `$${original.toFixed(2)}`;
+    } else {
+      origEl.style.display = "none";
+    }
+
+    finalEl.innerText = `$${final.toFixed(2)}`;
+  }
+
+  function saveCoupon(code, discount) {
+    localStorage.setItem("couponCode", code);
+    localStorage.setItem("couponDiscount", discount);
+  }
+
+  function applyCoupon() {
+    const code = document.getElementById("promo_code").value.trim();
+    if (!code) return;
+
+    fetch("/api/validate-coupon", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.valid) {
+        document.getElementById("coupon-message").innerText = "Invalid coupon";
+        return;
+      }
+
+      const nights = getNights();
+      const pricePerNight = getSelectedRoomPrice();
+
+      if (!nights || !pricePerNight) {
+        document.getElementById("coupon-message").innerText =
+          "Select room and dates first";
+        return;
+      }
+
+      const original = nights * pricePerNight;
+      const discount = (data.coupon.value / 100) * original;
+      const finalPrice = original - discount;
+
+      updatePrice(original, finalPrice);
+
+      saveCoupon(code, data.coupon.value);
+
+      document.getElementById("coupon-message").innerText =
+        "Coupon applied (cached in browser)";
+    });
+  }
+
+  // Restore cached coupon on reload
+  window.addEventListener("load", () => {
+    const code = localStorage.getItem("couponCode");
+    const discount = localStorage.getItem("couponDiscount");
+
+    if (!code || !discount) return;
+
+    document.getElementById("promo_code").value = code;
+
+    const nights = getNights();
+    const pricePerNight = getSelectedRoomPrice();
+
+    if (!nights || !pricePerNight) return;
+
+    const original = nights * pricePerNight;
+    const finalPrice = original - (discount / 100) * original;
+
+    updatePrice(original, finalPrice);
+
+    document.getElementById("coupon-message").innerText =
+      "Loaded discounted price from browser cache";
+  });
+</script>
+
+
+</body>
+</html>

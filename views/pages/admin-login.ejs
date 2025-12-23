@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main style="padding:6rem 0;">
+    <div class="container" style="max-width:480px;">
+      <div class="page-header" style="padding:2rem 1rem;">
+        <h1>Admin Login</h1>
+      </div>
+
+      <form method="POST" action="/admin/login" style="background:#fff;padding:2rem;border-radius:8px;box-shadow:var(--box-shadow);margin-top:1rem;">
+        <div style="margin-bottom:1rem;">
+          <label>Username</label>
+          <input name="username" required style="width:100%;padding:10px;margin-top:6px;" />
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label>Password</label>
+          <input name="password" type="password" required style="width:100%;padding:10px;margin-top:6px;" />
+        </div>
+        <% if (error) { %>
+          <div style="color:#c62828;margin-bottom:1rem;"><%= error %></div>
+        <% } %>
+        <button type="submit" class="submit-btn">Sign in</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

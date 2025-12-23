@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .admin-grid { display:grid; grid-template-columns: 1fr 420px; gap:1.5rem; padding:2rem 0; }
+    .card { background:#fff;padding:1rem;border-radius:8px;box-shadow:var(--box-shadow); }
+    table { width:100%; border-collapse:collapse; }
+    th,td { padding:8px; border-bottom:1px solid #eee; text-align:left; font-size:0.95rem; }
+    .admin-actions form { display:inline-block; margin-left:6px; }
+  </style>
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <main class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:1.5rem 0;">
+      <h1>Admin Dashboard</h1>
+      <div>
+        <strong><%= admin.username %></strong>
+        <a href="/admin/logout" class="cta-button" style="margin-left:12px;background:#c0392b;">Logout</a>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h2>Bookings</h2>
+          <table>
+            <thead><tr><th>#</th><th>Guest</th><th>Room</th><th>Dates</th><th>Price</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <% bookings.forEach(b => { %>
+                <tr>
+                  <td><%= b.id %></td>
+                  <td><strong><%= b.guest_name %></strong><br/><small><%= b.guest_email %></small></td>
+                  <td>#<%= b.room_number %> <small>(<%= b.room_type %>)</small></td>
+                  <td><%= b.check_in_date.toISOString().split('T')[0] %> → <%= b.check_out_date.toISOString().split('T')[0] %></td>
+                  <td>
+                    $<%= Number(b.total_price).toFixed(2) %>
+                    <% if (b.discount_amount && Number(b.discount_amount)>0) { %>
+                      <div style="font-size:0.85rem;color:#2e7d32;">- $<%= Number(b.discount_amount).toFixed(2) %> (<%= b.coupon_code %>)</div>
+                    <% } %>
+                  </td>
+                  <td><%= b.status %></td>
+                  <td class="admin-actions">
+                    <form method="POST" action="/admin/bookings/<%= b.id %>/cancel" style="display:inline;">
+                      <button class="submit-btn" style="background:#f39c12;padding:6px 10px;">Cancel</button>
+                    </form>
+                    <form method="POST" action="/admin/bookings/<%= b.id %>/delete" onsubmit="return confirm('Delete booking?');" style="display:inline;">
+                      <button class="submit-btn" style="background:#c0392b;padding:6px 10px;">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h2>Rooms</h2>
+          <table>
+            <thead><tr><th>#</th><th>Type</th><th>Price</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <% rooms.forEach(r => { %>
+                <tr>
+                  <td><%= r.room_number %></td>
+                  <td><%= r.room_type %></td>
+                  <td>$<%= Number(r.price_per_night).toFixed(2) %></td>
+                  <td><%= r.status %></td>
+                  <td>
+                    <a class="cta-button" href="/admin/rooms/<%= r.id %>/edit" style="padding:6px 10px;background:#3498db;">Edit</a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <div style="margin-top:12px;">
+            <a class="cta-button" href="/admin/rooms/new">Add New Room</a>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card">
+          <h3>Guests</h3>
+          <ul>
+            <% guests.forEach(g => { %>
+              <li style="margin-bottom:8px;"><strong><%= g.name %></strong><br/><small><%= g.email %></small></li>
+            <% }) %>
+          </ul>
+          <a href="/admin/guests" class="cta-button" style="margin-top:8px;display:inline-block;">View all guests</a>
+        </div>
+
+        <div class="card" style="margin-top:1rem;">
+          <h3>Quick Actions</h3>
+          <p>Common coupon codes:</p>
+          <ul>
+            <li>SAVE10 — 10% off</li>
+            <li>SAVE20 — 20% off</li>
+            <li>NEWUSER — 15% off</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
