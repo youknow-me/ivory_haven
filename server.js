@@ -27,6 +27,9 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  ssl: process.env.NODE_ENV === 'production'
+   ? { rejectUnauthorized: false }
+   : false,
 });
 
 pool.on('error', (err) =>
@@ -37,12 +40,16 @@ pool.on('error', (err) =>
    REDIS CLIENT
    ========================= */
 const redisClient = createClient({
-  url: 'redis://localhost:6379', // docker service name
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
 });
+
+redisClient.on('error', err => console.error('Redis Client Error', err));
 
 redisClient.connect()
   .then(() => console.log('Redis connected'))
   .catch(console.error);
+
+
 
 
 /* =========================
@@ -240,11 +247,6 @@ app.get('/contact', (req, res) =>
   res.render('pages/contact', { title: 'Contact Us' })
 );
 
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/login');
-  });
-});
 
 /* =========================
    USER LOGIN
@@ -252,11 +254,6 @@ app.get('/logout', (req, res) => {
 app.get('/login', (req, res) => {
   res.render('pages/login', { title: 'Login', error: null });
 });
-
-app.get('/register', (req, res) => {
-  res.render('pages/register', { title: 'Register', error: null });
-});
-
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -283,41 +280,6 @@ app.post('/login', async (req, res) => {
         error: 'Invalid email or password',
       });
     }
-
-   app.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
-
-  try {
-    const existing = await pool.query(
-      'SELECT id FROM users WHERE email=$1',
-      [email]
-    );
-
-    if (existing.rows.length > 0) {
-      return res.render('pages/register', {
-        title: 'Register',
-        error: 'User already exists',
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await pool.query(
-      'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3)',
-      [name, email, hashedPassword]
-    );
-
-    res.redirect('/login');
-  } catch (err) {
-    console.error(err);
-    res.render('pages/register', {
-      title: 'Register',
-      error: 'Server error',
-    });
-  }
-});
-
-
 
     // STORE USER INFO IN SESSION (REDIS)
     req.session.user = {
@@ -625,7 +587,7 @@ app.get('/admin/dashboard', ensureAdmin, async (req, res) => {
       bookings: bookingsRes.rows,
       rooms: roomsRes.rows,     // ✅ needed by EJS
       guests: guestsRes.rows,   // ✅ THIS FIXES CURRENT ERROR
-      admin: { username: req.session.user.adminUsername },
+      admin: { username: req.session.user.username },
     });
   } catch (err) {
     console.error(err);
@@ -672,3 +634,4 @@ app.post('/admin/bookings/:id/delete', ensureAdmin, async (req, res) => {
 app.listen(port, () => {
   console.log(`Ivory Haven running at http://localhost:${port}`);
 });
+
