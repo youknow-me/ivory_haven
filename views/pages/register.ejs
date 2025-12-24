@@ -30,5 +30,102 @@
 
 <%- include('../partials/footer') %>
 
+<style>
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1f2933, #111827);
+  color: #fff;
+}
+
+/* Centered auth box */
+.login-box {
+  width: 380px;
+  margin: 80px auto;
+  padding: 30px 25px;
+  background: #0f172a;
+  border-radius: 10px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Heading */
+.login-box h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #e5e7eb;
+}
+
+/* Inputs */
+.login-box input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 6px;
+  background: #020617;
+  color: #fff;
+  font-size: 14px;
+}
+
+.login-box input::placeholder {
+  color: #9ca3af;
+}
+
+/* Button */
+.login-box button {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.login-box button:hover {
+  background: #1d4ed8;
+}
+
+/* Error box */
+.error {
+  background: #7f1d1d;
+  color: #fecaca;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Links */
+.login-box a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.login-box a:hover {
+  text-decoration: underline;
+}
+
+/* Footer spacing fix */
+footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: #9ca3af;
+}
+</style>
+
 </body>
 </html>
+
