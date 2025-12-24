@@ -22,15 +22,10 @@ const port = process.env.PORT || 3000;
    DATABASE
    ========================= */
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  ssl: process.env.NODE_ENV === 'production'
-   ? { rejectUnauthorized: false }
-   : false,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
+
 
 pool.on('error', (err) =>
   console.error('Unexpected PG idle client error', err)
@@ -634,4 +629,5 @@ app.post('/admin/bookings/:id/delete', ensureAdmin, async (req, res) => {
 app.listen(port, () => {
   console.log(`Ivory Haven running at http://localhost:${port}`);
 });
+
 
